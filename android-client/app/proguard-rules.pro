@@ -1,0 +1,3 @@
+-keep class pro.svoiprox.parih.client.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**

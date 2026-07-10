@@ -1,0 +1,2 @@
+ALTER TABLE "Appointment" ADD COLUMN "duration" INTEGER NOT NULL DEFAULT 30;
+ALTER TABLE "Appointment" ADD COLUMN "price" INTEGER;

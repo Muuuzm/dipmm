@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+dev.db
+dev.db-journal
+npm-debug.log*
+android-client/.gradle
+android-client/.kotlin
+android-client/build
+android-client/app/build
