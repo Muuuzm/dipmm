@@ -1,35 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeAppointmentCore } from "../lib/validation-core.js";
+import { normalizeAppointmentRequestCore } from "../lib/validation-core.js";
 
 const validPayload = {
   name: "Иван",
   phone: "+7 900 000-00-00",
   service: "Мужская стрижка",
   master: "Илья Соколов",
-  date: "2026-07-10",
+  date: "2026-07-20",
   time: "12:30",
   comment: "Без комментариев"
 };
 
-test("accepts valid appointment data", () => {
-  assert.deepEqual(normalizeAppointmentCore(validPayload), {
-    ...validPayload,
-    duration: 40,
-    price: 900
-  });
+test("accepts and normalizes valid appointment data", () => {
+  assert.deepEqual(normalizeAppointmentRequestCore(validPayload), validPayload);
+});
+
+test("does not accept price and duration from the client", () => {
+  const normalized = normalizeAppointmentRequestCore({ ...validPayload, price: 1, duration: 1 });
+  assert.equal("price" in normalized, false);
+  assert.equal("duration" in normalized, false);
 });
 
 test("rejects empty required fields", () => {
-  assert.throws(
-    () => normalizeAppointmentCore({ ...validPayload, phone: "" }),
-    /Заполните все обязательные поля/
-  );
+  assert.throws(() => normalizeAppointmentRequestCore({ ...validPayload, phone: "" }), /обязательные поля/);
 });
 
-test("rejects unknown services", () => {
-  assert.throws(
-    () => normalizeAppointmentCore({ ...validPayload, service: "Маникюр" }),
-    /Выберите услугу из списка/
-  );
+test("rejects malformed phone, date and time", () => {
+  assert.throws(() => normalizeAppointmentRequestCore({ ...validPayload, phone: "123" }), /номер телефона/);
+  assert.throws(() => normalizeAppointmentRequestCore({ ...validPayload, date: "20.07.2026" }), /корректную дату/);
+  assert.throws(() => normalizeAppointmentRequestCore({ ...validPayload, time: "25:00" }), /корректное время/);
 });

@@ -38,8 +38,8 @@ buildConfigField("String", "PUBLIC_BASE_URL", "\"https://parih.svoiprox.pro\"")
 GET  /api/public/salon
 GET  /api/public/services
 GET  /api/public/masters
-GET  /api/public/masters?date=YYYY-MM-DD
-GET  /api/availability?date=YYYY-MM-DD&master=...&duration=...
+GET  /api/public/masters?date=YYYY-MM-DD&service=service-slug
+GET  /api/availability?date=YYYY-MM-DD&master=...&service=service-slug
 POST /api/appointments
 GET  /api/public/appointments/by-token/:publicToken
 ```

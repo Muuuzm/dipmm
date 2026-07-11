@@ -5,12 +5,12 @@ import {
   buildAppointmentWhere,
   formatCurrency,
   formatDateTime,
+  getMonthEnd,
   getMonthStart,
   getTodayValue,
+  getWeekEnd,
   getWeekStart,
-  MASTER_OPTIONS,
   parseAppointmentFilters,
-  SERVICE_OPTIONS,
   STATUS_LABELS
 } from "@/lib/admin-data";
 import { requireAdminSession } from "@/lib/admin-auth";
@@ -31,7 +31,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const where = buildAppointmentWhere(filters);
   const today = getTodayValue();
   const weekStart = getWeekStart();
+  const weekEnd = getWeekEnd();
   const monthStart = getMonthStart();
+  const monthEnd = getMonthEnd();
   const calendarDate = getSingleValue(rawSearchParams.calendarDate) || today;
 
   const [
@@ -43,28 +45,32 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     monthRevenueAgg,
     serviceGroups,
     masterGroups,
-    calendarAppointments
+    calendarAppointments,
+    masters,
+    services
   ] = await Promise.all([
     prisma.appointment.findMany({
       where,
       orderBy: [{ date: "desc" }, { time: "asc" }]
     }),
     prisma.appointment.count({ where: { date: today } }),
-    prisma.appointment.count({ where: { date: { gte: weekStart } } }),
-    prisma.appointment.count({ where: { date: { gte: monthStart } } }),
+    prisma.appointment.count({ where: { date: { gte: weekStart, lte: weekEnd } } }),
+    prisma.appointment.count({ where: { date: { gte: monthStart, lte: monthEnd } } }),
     prisma.appointment.count({ where: { status: "new" } }),
     prisma.appointment.aggregate({
-      where: { date: { gte: monthStart }, status: { not: "cancelled" } },
+      where: { date: { gte: monthStart, lte: monthEnd }, status: "completed" },
       _sum: { price: true }
     }),
     prisma.appointment.groupBy({
       by: ["service"],
+      where: { date: { gte: monthStart, lte: monthEnd }, status: { not: "cancelled" } },
       _count: { service: true },
       orderBy: { _count: { service: "desc" } },
       take: 1
     }),
     prisma.appointment.groupBy({
       by: ["master"],
+      where: { date: { gte: monthStart, lte: monthEnd }, status: { not: "cancelled" } },
       _count: { master: true },
       orderBy: { _count: { master: "desc" } },
       take: 1
@@ -72,7 +78,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     prisma.appointment.findMany({
       where: { date: calendarDate, status: { not: "cancelled" } },
       orderBy: [{ master: "asc" }, { time: "asc" }]
-    })
+    }),
+    prisma.master.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+    prisma.service.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } })
   ]);
 
   const exportQuery = params.toString();
@@ -87,6 +95,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <p>Управление заявками и расписанием парикмахерской.</p>
         </div>
         <div className="admin-header-actions">
+          <Link className="admin-top-button" href="/admin/catalog">
+            Каталог
+          </Link>
           <Link className="admin-top-button" href="/">
             На сайт
           </Link>
@@ -141,8 +152,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             Мастер
             <select name="master" defaultValue={filters.master ?? ""}>
               <option value="">Все</option>
-              {MASTER_OPTIONS.map((master) => (
-                <option key={master.name} value={master.name}>
+              {masters.map((master) => (
+                <option key={master.id} value={master.name}>
                   {master.name}
                 </option>
               ))}
@@ -152,8 +163,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             Услуга
             <select name="service" defaultValue={filters.service ?? ""}>
               <option value="">Все</option>
-              {SERVICE_OPTIONS.map((service) => (
-                <option key={service.title} value={service.title}>
+              {services.map((service) => (
+                <option key={service.id} value={service.title}>
                   {service.title}
                 </option>
               ))}

@@ -1,8 +1,6 @@
-import { getMasterByName, MASTER_OPTIONS } from "./validation-core";
-
 export const WORKING_HOURS = {
-  start: "09:00",
-  end: "21:00"
+  start: "10:00",
+  end: "20:00"
 };
 
 export type ExistingAppointment = {
@@ -10,32 +8,20 @@ export type ExistingAppointment = {
   duration: number;
 };
 
-export function getMastersForDate(date: string) {
-  const day = getDayOfWeek(date);
-  if (day === undefined) {
-    return [];
-  }
-
-  return MASTER_OPTIONS.filter((master) => master.workDays.includes(day));
-}
-
-export function isMasterWorkingOnDate(masterName: string, date: string) {
-  const master = getMasterByName(masterName);
-  const day = getDayOfWeek(date);
-
-  return Boolean(master && day !== undefined && master.workDays.includes(day));
-}
-
 export function buildAvailability(params: {
   date: string;
   master: string;
   duration: number;
   appointments: ExistingAppointment[];
+  blockedPeriods?: ExistingAppointment[];
+  workingHours?: { start: string; end: string };
   now?: Date;
 }) {
   const duration = Math.max(1, Math.round(params.duration));
-  const allSlots = buildCandidateSlots(duration);
-  const busySlots = buildBusySlots(params.appointments);
+  const workingHours = params.workingHours ?? WORKING_HOURS;
+  const blocks = [...params.appointments, ...(params.blockedPeriods ?? [])];
+  const allSlots = buildCandidateSlots(duration, workingHours);
+  const busySlots = buildBusySlots(blocks);
   const now = params.now ?? new Date();
 
   const availableSlots = allSlots.filter((slot) => {
@@ -43,13 +29,13 @@ export function buildAvailability(params: {
       return false;
     }
 
-    return !doesSlotOverlap(slot, duration, params.appointments);
+    return !doesSlotOverlap(slot, duration, blocks);
   });
 
   return {
     date: params.date,
     master: params.master,
-    workingHours: WORKING_HOURS,
+    workingHours,
     busySlots,
     availableSlots
   };
@@ -60,12 +46,15 @@ export function isSlotAvailable(params: {
   time: string;
   duration: number;
   appointments: ExistingAppointment[];
+  blockedPeriods?: ExistingAppointment[];
+  workingHours?: { start: string; end: string };
   now?: Date;
 }) {
   const start = timeToMinutes(params.time);
   const end = start + params.duration;
-  const dayStart = timeToMinutes(WORKING_HOURS.start);
-  const dayEnd = timeToMinutes(WORKING_HOURS.end);
+  const workingHours = params.workingHours ?? WORKING_HOURS;
+  const dayStart = timeToMinutes(workingHours.start);
+  const dayEnd = timeToMinutes(workingHours.end);
 
   if (start < dayStart || end > dayEnd) {
     return false;
@@ -79,7 +68,10 @@ export function isSlotAvailable(params: {
     return false;
   }
 
-  return !doesSlotOverlap(params.time, params.duration, params.appointments);
+  return !doesSlotOverlap(params.time, params.duration, [
+    ...params.appointments,
+    ...(params.blockedPeriods ?? [])
+  ]);
 }
 
 export function buildBusySlots(appointments: ExistingAppointment[]) {
@@ -112,10 +104,20 @@ export function minutesToTime(totalMinutes: number) {
   return `${hours}:${minutes}`;
 }
 
-function buildCandidateSlots(duration: number) {
+export function buildSlotReservations(time: string, duration: number) {
+  const start = timeToMinutes(time);
+  const count = Math.ceil(Math.max(30, duration) / 30);
+
+  return Array.from({ length: count }, (_, index) => minutesToTime(start + index * 30));
+}
+
+function buildCandidateSlots(
+  duration: number,
+  workingHours: { start: string; end: string }
+) {
   const slots: string[] = [];
-  const start = timeToMinutes(WORKING_HOURS.start);
-  const end = timeToMinutes(WORKING_HOURS.end);
+  const start = timeToMinutes(workingHours.start);
+  const end = timeToMinutes(workingHours.end);
 
   for (let minutes = start; minutes + duration <= end; minutes += 30) {
     slots.push(minutesToTime(minutes));
@@ -146,7 +148,7 @@ function isPastSlot(date: string, time: string, now: Date) {
   return Number.isNaN(slotDate.getTime()) || slotDate.getTime() <= now.getTime();
 }
 
-function getDayOfWeek(date: string) {
+export function getDayOfWeek(date: string) {
   const parsed = new Date(`${date}T12:00:00`);
   if (Number.isNaN(parsed.getTime())) {
     return undefined;

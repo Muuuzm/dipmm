@@ -226,11 +226,15 @@ private fun ServicesScreen(api: PrestigeApi, onBook: (Service) -> Unit) {
         if (error.isNotBlank()) ErrorCard(error)
         services.forEach { service ->
             SectionCard {
-                Text(service.icon, fontSize = 24.sp)
+                Text(serviceIcon(service.icon), fontSize = 24.sp)
                 Text(service.title, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Text(service.description, color = Muted)
                 Text("${service.priceLabel} · ${service.durationLabel}", color = PrimaryDark, fontWeight = FontWeight.Bold)
-                PrimaryButton("Записаться") { onBook(service) }
+                if (service.isBookable) {
+                    PrimaryButton("Записаться") { onBook(service) }
+                } else {
+                    Text("Запись и стоимость уточняются по телефону", color = PrimaryDark, fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
@@ -259,17 +263,18 @@ private fun BookingScreen(
 
     LaunchedEffect(Unit) {
         runCatching {
-            services = api.getServices()
+            services = api.getServices().filter { it.isBookable }
             if (selectedService == null) selectedService = services.firstOrNull()
         }.onFailure { message = "Нет подключения. Не удалось загрузить услуги." }
     }
 
-    LaunchedEffect(selectedDate) {
+    LaunchedEffect(selectedDate, selectedService) {
         selectedMaster = null
         selectedTime = ""
         slots = emptyList()
         val date = selectedDate ?: return@LaunchedEffect
-        runCatching { masters = api.getMasters(date.toString()) }
+        val service = selectedService ?: return@LaunchedEffect
+        runCatching { masters = api.getMasters(date.toString(), service.slug) }
             .onFailure { message = "Не удалось загрузить мастеров на смене." }
     }
 
@@ -278,7 +283,7 @@ private fun BookingScreen(
         val service = selectedService ?: return@LaunchedEffect
         val date = selectedDate ?: return@LaunchedEffect
         val master = selectedMaster ?: return@LaunchedEffect
-        runCatching { slots = api.getAvailability(date.toString(), master.name, service.duration) }
+        runCatching { slots = api.getAvailability(date.toString(), master.name, service.slug) }
             .onFailure { message = "Не удалось загрузить свободное время." }
     }
 
@@ -637,7 +642,7 @@ private val prestigeColors = lightColorScheme(
 )
 
 private data class SalonInfo(val description: String, val workingHours: String, val phone: String)
-private data class Service(val icon: String, val title: String, val price: Int, val priceLabel: String, val duration: Int, val durationLabel: String, val description: String)
+private data class Service(val slug: String, val icon: String, val title: String, val price: Int, val priceLabel: String, val duration: Int, val durationLabel: String, val description: String, val isBookable: Boolean)
 private data class Master(val name: String, val role: String, val experience: String, val image: String)
 private data class Appointment(val service: String, val master: String, val date: String, val time: String, val price: Int?, val duration: Int, val status: String)
 private data class ClientProfile(val name: String = "", val phone: String = "")
@@ -658,26 +663,29 @@ private class PrestigeApi(private val baseUrl: String) {
     suspend fun getServices(): List<Service> = withContext(Dispatchers.IO) {
         getJson("/api/public/services").getJSONArray("services").mapObjects {
             Service(
+                slug = it.getString("slug"),
                 icon = it.getString("icon"),
                 title = it.getString("title"),
                 price = it.getInt("price"),
                 priceLabel = it.getString("priceLabel"),
                 duration = it.getInt("duration"),
                 durationLabel = it.getString("durationLabel"),
-                description = it.getString("description")
+                description = it.getString("description"),
+                isBookable = it.optBoolean("isBookable", true)
             )
         }
     }
 
-    suspend fun getMasters(date: String): List<Master> = withContext(Dispatchers.IO) {
+    suspend fun getMasters(date: String, service: String): List<Master> = withContext(Dispatchers.IO) {
         val encodedDate = URLEncoder.encode(date, "UTF-8")
-        getJson("/api/public/masters?date=$encodedDate").getJSONArray("masters").mapObjects {
+        val encodedService = URLEncoder.encode(service, "UTF-8")
+        getJson("/api/public/masters?date=$encodedDate&service=$encodedService").getJSONArray("masters").mapObjects {
             Master(it.getString("name"), it.getString("role"), it.getString("experience"), it.getString("image"))
         }
     }
 
-    suspend fun getAvailability(date: String, master: String, duration: Int): List<String> = withContext(Dispatchers.IO) {
-        val path = "/api/availability?date=${encode(date)}&master=${encode(master)}&duration=$duration"
+    suspend fun getAvailability(date: String, master: String, service: String): List<String> = withContext(Dispatchers.IO) {
+        val path = "/api/availability?date=${encode(date)}&master=${encode(master)}&service=${encode(service)}"
         getJson(path).getJSONArray("availableSlots").mapStrings()
     }
 
@@ -798,6 +806,18 @@ private object ImageCache {
 
 private fun JSONArray.mapStrings(): List<String> = List(length()) { index -> getString(index) }
 private fun <T> JSONArray.mapObjects(block: (JSONObject) -> T): List<T> = List(length()) { index -> block(getJSONObject(index)) }
+
+private fun serviceIcon(icon: String): String = when (icon) {
+    "scissors" -> "✂"
+    "sparkles" -> "✦"
+    "heart" -> "♡"
+    "palette" -> "◉"
+    "waves" -> "≋"
+    "leaf" -> "⌁"
+    "hand" -> "◇"
+    "activity" -> "≈"
+    else -> "✦"
+}
 
 private fun formatPhone(raw: String): String {
     val digits = raw.filter { it.isDigit() }.removePrefix("8").removePrefix("7").let { "7$it" }.take(11)

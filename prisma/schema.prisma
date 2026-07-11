@@ -8,17 +8,157 @@ datasource db {
 }
 
 model Appointment {
-  id        Int      @id @default(autoincrement())
-  name      String
-  phone     String
-  service   String
-  master    String
+  id          Int               @id @default(autoincrement())
+  name        String
+  phone       String
+  service     String
+  master      String
+  date        String
+  time        String
+  duration    Int               @default(30)
+  price       Int?
+  publicToken String?           @unique
+  comment     String?
+  status      String            @default("new")
+  createdAt   DateTime          @default(now())
+  serviceId   Int?
+  masterId    Int?
+  serviceRef  Service?          @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  masterRef   Master?           @relation(fields: [masterId], references: [id], onDelete: SetNull)
+  slots       AppointmentSlot[]
+
+  @@index([date, masterId, status])
+  @@index([phone, date])
+}
+
+model Service {
+  id           Int             @id @default(autoincrement())
+  slug         String          @unique
+  icon         String
+  title        String          @unique
+  price        Int
+  duration     Int
+  description  String
+  isPopular    Boolean         @default(true)
+  isActive     Boolean         @default(true)
+  isBookable   Boolean         @default(true)
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  masters      MasterService[]
+  appointments Appointment[]
+}
+
+model Master {
+  id           Int               @id @default(autoincrement())
+  slug         String            @unique
+  name         String            @unique
+  role         String
+  experience   String
+  bio          String?
+  image        String
+  tags         String            @default("")
+  isActive     Boolean           @default(true)
+  sortOrder    Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  services     MasterService[]
+  shifts       WeeklyShift[]
+  timeOffs     TimeOff[]
+  appointments Appointment[]
+  slots        AppointmentSlot[]
+}
+
+model MasterService {
+  masterId  Int
+  serviceId Int
+  master    Master  @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([masterId, serviceId])
+}
+
+model WeeklyShift {
+  id        Int     @id @default(autoincrement())
+  masterId  Int
+  dayOfWeek Int
+  startTime String  @default("10:00")
+  endTime   String  @default("20:00")
+  isWorking Boolean @default(true)
+  master    Master  @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@unique([masterId, dayOfWeek])
+}
+
+model TimeOff {
+  id        Int     @id @default(autoincrement())
+  masterId  Int?
   date      String
-  time      String
-  duration  Int      @default(30)
-  price     Int?
-  publicToken String?  @unique
-  comment   String?
-  status    String   @default("new")
+  startTime String?
+  endTime   String?
+  reason    String?
+  master    Master? @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@index([date, masterId])
+}
+
+model AppointmentSlot {
+  id            Int         @id @default(autoincrement())
+  appointmentId Int
+  masterId      Int
+  date          String
+  time          String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  master        Master      @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@unique([masterId, date, time])
+  @@index([appointmentId])
+}
+
+model SalonSettings {
+  id                Int      @id @default(1)
+  name              String
+  subtitle          String
+  tagline           String
+  description       String
+  workingHoursStart String   @default("10:00")
+  workingHoursEnd   String   @default("20:00")
+  weekendHoursStart String   @default("10:00")
+  weekendHoursEnd   String   @default("19:00")
+  phone             String
+  email             String
+  address           String
+  heroImage         String
+  aboutImage        String
+  vkUrl             String?
+  telegramUrl       String?
+  whatsappUrl       String?
+  mapUrl            String?
+  latitude          Float?
+  longitude         Float?
+  updatedAt         DateTime @updatedAt
+}
+
+model GalleryItem {
+  id        Int      @id @default(autoincrement())
+  image     String
+  alt       String
+  category  String
+  title     String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  clientName  String
+  text        String
+  rating      Int      @default(5)
+  serviceName String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

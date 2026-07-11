@@ -5,11 +5,18 @@ import { useState } from "react";
 const links = [
   { href: "#services", label: "Услуги" },
   { href: "#masters", label: "Мастера" },
+  { href: "#portfolio", label: "Работы" },
   { href: "#about", label: "О нас" },
   { href: "#contacts", label: "Контакты" }
 ];
 
-export function SiteHeader() {
+export function SiteHeader({
+  salonName = "Студия Престиж",
+  subtitle = "парикмахерская для всей семьи"
+}: {
+  salonName?: string;
+  subtitle?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeMenu() {
@@ -19,8 +26,8 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <a className="brand" href="#home" onClick={closeMenu}>
-        <strong>Студия Престиж</strong>
-        <span>парикмахерская для всей семьи</span>
+        <strong>{salonName}</strong>
+        <span>{subtitle}</span>
       </a>
 
       <button

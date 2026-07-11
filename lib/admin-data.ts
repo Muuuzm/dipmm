@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { MASTER_OPTIONS, SERVICE_OPTIONS } from "./validation-core";
 
 export const STATUS_LABELS = {
   new: "Новая",
@@ -74,8 +73,19 @@ export function getWeekStart(now = new Date()) {
   return toDateValue(date);
 }
 
+export function getWeekEnd(now = new Date()) {
+  const date = new Date(now);
+  const day = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() + (6 - day));
+  return toDateValue(date);
+}
+
 export function getMonthStart(now = new Date()) {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+}
+
+export function getMonthEnd(now = new Date()) {
+  return toDateValue(new Date(now.getFullYear(), now.getMonth() + 1, 0));
 }
 
 export function formatCurrency(value: number | null | undefined) {
@@ -95,8 +105,6 @@ export function formatDateTime(value: Date) {
     minute: "2-digit"
   }).format(value);
 }
-
-export { MASTER_OPTIONS, SERVICE_OPTIONS };
 
 function clean(value: string | null) {
   const trimmed = value?.trim();
