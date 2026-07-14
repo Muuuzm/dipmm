@@ -14,7 +14,7 @@ export async function getSalonInfo() {
       { days: "Понедельник-пятница", start: value.workingHoursStart, end: value.workingHoursEnd },
       { days: "Суббота-воскресенье", start: value.weekendHoursStart, end: value.weekendHoursEnd }
     ],
-    benefits: ["Опытные мастера", "Качественная косметика", "Забота о каждом клиенте"]
+    benefits: ["Мужские стрижки", "Женские услуги", "Онлайн-запись"]
   };
 }
 

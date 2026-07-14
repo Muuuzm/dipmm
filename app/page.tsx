@@ -10,10 +10,10 @@ import {
 export const dynamic = "force-dynamic";
 
 const advantages = [
-  ["01", "Профессиональные мастера", "Команда с сильной специализацией и вниманием к деталям."],
-  ["02", "Уютная атмосфера", "Спокойное пространство, где можно замедлиться и отдохнуть."],
-  ["03", "Честная консультация", "Подбираем образ и уход под ваши волосы и ритм жизни."],
-  ["04", "Качественная косметика", "Работаем с проверенными составами и бережными техниками."]
+  ["01", "Мужские стрижки", "Основное направление парикмахерской — практичные мужские стрижки на каждый день."],
+  ["02", "Женские услуги", "Выполняем женские стрижки и принимаем на отдельные услуги по предварительной записи."],
+  ["03", "Понятные цены", "Показываем стоимость и длительность услуги до оформления записи."],
+  ["04", "Запись без звонка", "Для доступных услуг можно выбрать дату, мастера и свободное время онлайн."]
 ];
 
 export default async function Home() {
@@ -35,17 +35,14 @@ export default async function Home() {
       <section className="hero" id="home">
         <div className="hero-shell">
           <div className="hero-copy">
-            <span className="section-badge">Парикмахерская для всей семьи</span>
+            <span className="section-badge">Парикмахерская в Архангельске</span>
             <h1>{salon.tagline}</h1>
             <p>{salon.description}</p>
             <div className="hero-actions">
               <a className="button button-primary" href="/booking">Записаться онлайн</a>
               <a className="button button-ghost" href="#services">Посмотреть услуги</a>
             </div>
-            <div className="hero-trust">
-              <span><strong>4.9</strong> средняя оценка</span>
-              <span><strong>3000+</strong> гостей студии</span>
-            </div>
+            <div className="hero-trust"><span><strong>от 180 ₽</strong> мужская стрижка</span><span><strong>Онлайн</strong> выбор свободного времени</span></div>
           </div>
 
           <div className="hero-visual" aria-label="Интерьер Студии Престиж">
@@ -56,17 +53,17 @@ export default async function Home() {
         </div>
 
         <div className="benefit-row">
-          <article className="benefit-card"><span>8+</span><div><strong>Опытные мастера</strong><p>лет практики</p></div></article>
-          <article className="benefit-card"><span>6</span><div><strong>Направлений услуг</strong><p>для всей семьи</p></div></article>
-          <article className="benefit-card"><span>24/7</span><div><strong>Онлайн-запись</strong><p>без звонка</p></div></article>
+          <article className="benefit-card"><span>01</span><div><strong>Мужские стрижки</strong><p>основное направление</p></div></article>
+          <article className="benefit-card"><span>02</span><div><strong>Женские услуги</strong><p>по предварительной записи</p></div></article>
+          <article className="benefit-card"><span>30</span><div><strong>Минут</strong><p>интервал онлайн-записи</p></div></article>
         </div>
       </section>
 
       <section className="section services-section" id="services">
         <div className="section-heading centered">
-          <span className="section-badge">Популярные направления</span>
-          <h2>Услуги для любого образа</h2>
-          <p>Выберите услугу и сразу перейдите к свободным мастерам и времени.</p>
+          <span className="section-badge">Услуги и цены</span>
+          <h2>В первую очередь — мужские стрижки</h2>
+          <p>Также доступны женская стрижка, маникюр и массаж. Возможность онлайн-записи указана отдельно для каждой услуги.</p>
         </div>
         <div className="service-grid">
           {services.map((service, index) => (
@@ -90,15 +87,15 @@ export default async function Home() {
 
       <section className="section masters-section" id="masters">
         <div className="section-heading split-heading">
-          <div><span className="section-badge">Команда</span><h2>Мастера, которым доверяют</h2></div>
-          <p>У каждого мастера своя специализация. Система записи покажет только тех, кто выполняет выбранную услугу и работает в нужный день.</p>
+          <div><span className="section-badge">Расписание</span><h2>Два мастера по сменам</h2></div>
+          <p>Каждый мастер работает два дня в неделю. При выборе даты система показывает только того, кто находится на смене и выполняет нужную услугу.</p>
         </div>
         <div className="master-grid">
           {masters.map((master) => (
             <article className="master-card" key={master.slug}>
               <div className="master-photo"><img src={master.image} alt={master.name} loading="lazy" /><span>На связи</span></div>
               <div className="master-body">
-                <small>{master.experience}</small>
+                <small>{master.workDaysLabel}</small>
                 <h3>{master.name}</h3>
                 <p className="master-role">{master.role}</p>
                 {master.bio ? <p>{master.bio}</p> : null}
@@ -113,9 +110,9 @@ export default async function Home() {
       {gallery.length ? (
         <section className="portfolio-section" id="portfolio">
           <div className="section-heading centered">
-            <span className="section-badge dark">Наши работы</span>
-            <h2>Результат говорит за нас</h2>
-            <p>Стрижки, окрашивания и укладки, созданные мастерами студии.</p>
+            <span className="section-badge dark">Услуги</span>
+            <h2>Основные направления</h2>
+            <p>Иллюстрации направлений работы. Реальные фотографии салона и стрижек можно добавить через админку.</p>
           </div>
           <div className="portfolio-grid">
             {gallery.map((item) => (
@@ -131,9 +128,9 @@ export default async function Home() {
       <section className="about-section" id="about">
         <div className="about-copy">
           <span className="section-badge">О студии</span>
-          <h2>Место, куда приятно возвращаться</h2>
-          <p>Мы соединили профессиональный подход, спокойную атмосферу и удобную онлайн-запись. Здесь слышат пожелания, объясняют каждый этап и помогают сохранить результат дома.</p>
-          <div className="stats-row"><div><strong>8+</strong><span>лет опыта</span></div><div><strong>3000+</strong><span>клиентов</span></div><div><strong>4.9</strong><span>оценка гостей</span></div></div>
+          <h2>Обычная парикмахерская с удобной записью</h2>
+          <p>Студия находится на проспекте Победы, 58. Основное направление — мужские стрижки. Женские стрижки и дополнительные услуги также доступны; актуальную стоимость и возможность записи можно посмотреть выше.</p>
+          <div className="stats-row"><div><strong>2</strong><span>мастера</span></div><div><strong>4</strong><span>услуги на сайте</span></div><div><strong>10:00</strong><span>начало работы</span></div></div>
         </div>
         <div className="about-panel">
           <img src={salon.aboutImage} alt="Рабочее пространство Студии Престиж" loading="lazy" />
@@ -143,7 +140,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {reviews.length ? (
+      {false && reviews.length ? (
         <section className="section reviews-section">
           <div className="section-heading split-heading"><div><span className="section-badge">Отзывы</span><h2>Нас рекомендуют</h2></div><p>Тёплые слова клиентов после визита в студию.</p></div>
           <div className="reviews-grid">

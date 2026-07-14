@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 const salon = {
   id: 1,
   name: "Студия Престиж",
-  subtitle: "парикмахерская для всей семьи",
-  tagline: "Красота в каждой детали",
+  subtitle: "мужские и женские стрижки",
+  tagline: "Мужские стрижки рядом с домом",
   description:
-    "Профессиональные стрижки, окрашивание и уход за волосами в уютной атмосфере салона, куда хочется возвращаться.",
+    "В основном занимаемся мужскими стрижками. Также выполняем женские стрижки и другие услуги по предварительной записи.",
   workingHoursStart: "10:00",
   workingHoursEnd: "20:00",
   weekendHoursStart: "10:00",
@@ -53,35 +53,24 @@ const masters = [
   {
     slug: "anna-volkova",
     name: "Анна Волкова",
-    role: "Колорист, стилист",
-    experience: "8 лет опыта",
-    bio: "Специализируется на сложных окрашиваниях, восстановлении волос и мягких женских образах.",
+    role: "Парикмахер",
+    experience: "Женские и мужские стрижки",
+    bio: "Выполняет женские и мужские стрижки по предварительной записи.",
     image: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=900&q=85",
-    tags: "окрашивание|уход|женские стрижки",
-    workDays: [1, 3, 5, 6],
-    serviceSlugs: ["womens-haircut", "kids-haircut", "coloring", "styling", "hair-care"]
+    tags: "женские стрижки|мужские стрижки",
+    workDays: [1, 3],
+    serviceSlugs: ["mens-haircut", "womens-haircut"]
   },
   {
     slug: "ilya-sokolov",
     name: "Илья Соколов",
-    role: "Барбер, мужские стрижки",
-    experience: "6 лет опыта",
-    bio: "Работает с классическими и современными мужскими формами, бородой и детскими стрижками.",
+    role: "Парикмахер, мужские стрижки",
+    experience: "Основное направление — мужские стрижки",
+    bio: "Выполняет мужские стрижки и помогает подобрать удобную повседневную форму.",
     image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=85",
-    tags: "барберинг|борода|мужские стрижки",
-    workDays: [0, 2, 4, 6],
-    serviceSlugs: ["mens-haircut", "kids-haircut"]
-  },
-  {
-    slug: "maria-orlova",
-    name: "Мария Орлова",
-    role: "Стилист",
-    experience: "5 лет опыта",
-    bio: "Создает легкие стрижки и укладки, подбирает домашний уход и образы для особых случаев.",
-    image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=900&q=85",
-    tags: "укладки|уход|стрижки",
-    workDays: [1, 2, 4, 5],
-    serviceSlugs: ["womens-haircut", "kids-haircut", "coloring", "styling", "hair-care"]
+    tags: "мужские стрижки",
+    workDays: [2, 4],
+    serviceSlugs: ["mens-haircut"]
   }
 ];
 
@@ -106,7 +95,16 @@ async function main() {
   for (const [index, seed] of masters.entries()) {
     const master = await prisma.master.upsert({
       where: { slug: seed.slug },
-      update: {},
+      update: {
+        name: seed.name,
+        role: seed.role,
+        experience: seed.experience,
+        bio: seed.bio,
+        image: seed.image,
+        tags: seed.tags,
+        isActive: true,
+        sortOrder: (index + 1) * 10
+      },
       create: {
         slug: seed.slug,
         name: seed.name,
@@ -118,6 +116,9 @@ async function main() {
         sortOrder: (index + 1) * 10
       }
     });
+
+    await prisma.weeklyShift.deleteMany({ where: { masterId: master.id } });
+    await prisma.masterService.deleteMany({ where: { masterId: master.id } });
 
     for (const dayOfWeek of seed.workDays) {
       const shift = {
@@ -141,6 +142,11 @@ async function main() {
       });
     }
   }
+
+  await prisma.master.updateMany({
+    where: { slug: { notIn: masters.map((master) => master.slug) } },
+    data: { isActive: false }
+  });
 
   if ((await prisma.galleryItem.count()) === 0) {
     await prisma.galleryItem.createMany({

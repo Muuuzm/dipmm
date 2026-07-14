@@ -189,10 +189,10 @@ private fun HomeScreen(
 
     ScreenList {
         Text("Студия Престиж", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-        Text("Красота в каждой детали", color = PrimaryDark, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text("Мужские стрижки рядом с домом", color = PrimaryDark, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Text(
             salon?.description
-                ?: "Профессиональные стрижки, окрашивание и уход за волосами в уютной атмосфере.",
+                ?: "Мужские и женские стрижки по предварительной записи.",
             color = Muted
         )
         PrimaryButton("Записаться онлайн", onBook)
