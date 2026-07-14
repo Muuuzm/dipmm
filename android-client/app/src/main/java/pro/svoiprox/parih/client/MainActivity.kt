@@ -188,8 +188,8 @@ private fun HomeScreen(
     }
 
     ScreenList {
-        Text("Студия Престиж", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-        Text("Мужские стрижки рядом с домом", color = PrimaryDark, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text("Зеркала", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+        Text("Стрижки без лишних слов", color = PrimaryDark, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Text(
             salon?.description
                 ?: "Мужские и женские стрижки по предварительной записи.",
@@ -816,6 +816,7 @@ private fun serviceIcon(icon: String): String = when (icon) {
     "leaf" -> "⌁"
     "hand" -> "◇"
     "activity" -> "≈"
+    "eye" -> "◌"
     else -> "✦"
 }
 

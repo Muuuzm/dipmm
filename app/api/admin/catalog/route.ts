@@ -84,13 +84,14 @@ async function updateCatalog(request: Request) {
     const master = await prisma.$transaction(async (tx) => {
       await tx.masterService.deleteMany({ where: { masterId: id } });
       await tx.weeklyShift.deleteMany({ where: { masterId: id } });
+      const salon = await tx.salonSettings.findUnique({ where: { id: 1 } });
       await tx.masterService.createMany({ data: serviceIds.map((serviceId) => ({ masterId: id, serviceId })) });
       await tx.weeklyShift.createMany({
         data: workDays.map((dayOfWeek) => ({
           masterId: id,
           dayOfWeek,
-          startTime: "10:00",
-          endTime: dayOfWeek === 0 || dayOfWeek === 6 ? "19:00" : "20:00"
+          startTime: dayOfWeek === 0 || dayOfWeek === 6 ? salon?.weekendHoursStart ?? "11:00" : salon?.workingHoursStart ?? "11:00",
+          endTime: dayOfWeek === 0 || dayOfWeek === 6 ? salon?.weekendHoursEnd ?? "18:00" : salon?.workingHoursEnd ?? "19:00"
         }))
       });
       return tx.master.update({

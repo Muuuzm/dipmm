@@ -4,18 +4,20 @@ const prisma = new PrismaClient();
 
 const salon = {
   id: 1,
-  name: "Студия Престиж",
-  subtitle: "мужские и женские стрижки",
-  tagline: "Мужские стрижки рядом с домом",
+  name: "Зеркала",
+  subtitle: "парикмахерская в Северодвинске",
+  tagline: "Стрижки без лишних слов",
   description:
-    "В основном занимаемся мужскими стрижками. Также выполняем женские стрижки и другие услуги по предварительной записи.",
-  workingHoursStart: "10:00",
-  workingHoursEnd: "20:00",
-  weekendHoursStart: "10:00",
-  weekendHoursEnd: "19:00",
-  phone: "+7 (950) 252-69-99",
+    "Мужские и женские стрижки по предварительной записи. Дополнительно доступны услуги для волос, ногтей, бровей и ресниц.",
+  workingHoursStart: "11:00",
+  workingHoursEnd: "19:00",
+  workingDaysLabel: "Вт-пт",
+  weekendHoursStart: "11:00",
+  weekendHoursEnd: "18:00",
+  weekendDaysLabel: "Сб",
+  phone: "+7 (900) 911-02-22",
   email: "",
-  address: "г. Архангельск, просп. Победы, 58",
+  address: "г. Северодвинск, ул. Лебедева, 7А",
   heroImage:
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1400&q=88",
   aboutImage:
@@ -23,16 +25,18 @@ const salon = {
   vkUrl: null,
   telegramUrl: null,
   whatsappUrl: null,
-  mapUrl: "https://yandex.ru/maps/-/CTBrYHlm",
-  latitude: 64.537494,
-  longitude: 39.805033
+  mapUrl: "https://yandex.ru/maps/org/zerkala/3862380459/",
+  latitude: 64.540552,
+  longitude: 39.804762
 };
 
 const services = [
-  ["mens-haircut", "scissors", "Мужская стрижка", 180, 40, "Аккуратная мужская стрижка с учетом формы головы и привычного стиля.", true, true],
+  ["mens-haircut", "scissors", "Мужская стрижка", 200, 40, "Классическая или короткая мужская стрижка с учетом пожеланий клиента.", true, true],
   ["womens-haircut", "sparkles", "Женская стрижка", 350, 60, "Женская стрижка с подбором формы и рекомендациями по домашнему уходу.", true, true],
-  ["manicure", "hand", "Классический маникюр с покрытием", 350, 90, "Классический женский маникюр с аккуратным покрытием.", true, false],
+  ["manicure", "hand", "Маникюр", 0, 90, "Маникюр и покрытие. Стоимость уточняется при записи.", true, false],
   ["massage", "activity", "Массаж", 0, 60, "Массажные процедуры. Стоимость и продолжительность уточняйте по телефону.", true, false],
+  ["pedicure", "sparkles", "Педикюр", 0, 90, "Педикюр по предварительной записи. Стоимость уточняется по телефону.", true, false],
+  ["brows-lashes", "eye", "Брови и ресницы", 0, 60, "Оформление бровей и ресниц по предварительной записи.", true, false],
   ["kids-haircut", "heart", "Детская стрижка", 700, 30, "Спокойный подход к маленьким гостям и быстрый аккуратный результат.", false, true],
   ["coloring", "palette", "Окрашивание", 3200, 120, "Мягкие переходы, стойкий цвет и бережная работа с качеством волос.", false, true],
   ["styling", "waves", "Укладка", 1100, 45, "Повседневные и вечерние образы с естественным объемом и фиксацией.", false, true],
@@ -58,7 +62,7 @@ const masters = [
     bio: "Выполняет женские и мужские стрижки по предварительной записи.",
     image: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=900&q=85",
     tags: "женские стрижки|мужские стрижки",
-    workDays: [1, 3],
+    workDays: [2, 5],
     serviceSlugs: ["mens-haircut", "womens-haircut"]
   },
   {
@@ -69,7 +73,7 @@ const masters = [
     bio: "Выполняет мужские стрижки и помогает подобрать удобную повседневную форму.",
     image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=85",
     tags: "мужские стрижки",
-    workDays: [2, 4],
+    workDays: [3, 6],
     serviceSlugs: ["mens-haircut"]
   }
 ];
@@ -122,8 +126,8 @@ async function main() {
 
     for (const dayOfWeek of seed.workDays) {
       const shift = {
-        startTime: "10:00",
-        endTime: dayOfWeek === 0 || dayOfWeek === 6 ? "19:00" : "20:00"
+        startTime: "11:00",
+        endTime: dayOfWeek === 6 ? "18:00" : "19:00"
       };
       await prisma.weeklyShift.upsert({
         where: { masterId_dayOfWeek: { masterId: master.id, dayOfWeek } },

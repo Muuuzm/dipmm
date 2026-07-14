@@ -35,14 +35,14 @@ export default async function Home() {
       <section className="hero" id="home">
         <div className="hero-shell">
           <div className="hero-copy">
-            <span className="section-badge">Парикмахерская в Архангельске</span>
+            <span className="section-badge">Парикмахерская в Северодвинске</span>
             <h1>{salon.tagline}</h1>
             <p>{salon.description}</p>
             <div className="hero-actions">
               <a className="button button-primary" href="/booking">Записаться онлайн</a>
               <a className="button button-ghost" href="#services">Посмотреть услуги</a>
             </div>
-            <div className="hero-trust"><span><strong>от 180 ₽</strong> мужская стрижка</span><span><strong>Онлайн</strong> выбор свободного времени</span></div>
+            <div className="hero-trust"><span><strong>от 200 ₽</strong> мужская стрижка</span><span><strong>Онлайн</strong> выбор свободного времени</span></div>
           </div>
 
           <div className="hero-visual" aria-label="Интерьер Студии Престиж">
@@ -63,7 +63,7 @@ export default async function Home() {
         <div className="section-heading centered">
           <span className="section-badge">Услуги и цены</span>
           <h2>В первую очередь — мужские стрижки</h2>
-          <p>Также доступны женская стрижка, маникюр и массаж. Возможность онлайн-записи указана отдельно для каждой услуги.</p>
+          <p>Также доступны женская стрижка, маникюр, педикюр, массаж и оформление бровей и ресниц. Возможность онлайн-записи указана отдельно.</p>
         </div>
         <div className="service-grid">
           {services.map((service, index) => (
@@ -129,8 +129,8 @@ export default async function Home() {
         <div className="about-copy">
           <span className="section-badge">О студии</span>
           <h2>Обычная парикмахерская с удобной записью</h2>
-          <p>Студия находится на проспекте Победы, 58. Основное направление — мужские стрижки. Женские стрижки и дополнительные услуги также доступны; актуальную стоимость и возможность записи можно посмотреть выше.</p>
-          <div className="stats-row"><div><strong>2</strong><span>мастера</span></div><div><strong>4</strong><span>услуги на сайте</span></div><div><strong>10:00</strong><span>начало работы</span></div></div>
+          <p>Парикмахерская находится на улице Лебедева, 7А. Основные направления — мужские и женские стрижки. Дополнительные услуги доступны по предварительной записи.</p>
+          <div className="stats-row"><div><strong>2</strong><span>мастера</span></div><div><strong>6</strong><span>направлений услуг</span></div><div><strong>11:00</strong><span>начало работы</span></div></div>
         </div>
         <div className="about-panel">
           <img src={salon.aboutImage} alt="Рабочее пространство Студии Престиж" loading="lazy" />
@@ -157,8 +157,8 @@ export default async function Home() {
       <section className="contacts-section" id="contacts">
         <div className="contacts-card"><span className="section-badge">Контакты</span><h2>Ждём вас</h2><ul className="contact-list"><li><span>Адрес</span><strong>{salon.address}</strong></li><li><span>Телефон</span><a href={`tel:${salon.phone.replace(/[^+\d]/g, "")}`}>{salon.phone}</a></li>{salon.email ? <li><span>Email</span><a href={`mailto:${salon.email}`}>{salon.email}</a></li> : null}<li><span>Режим работы</span><strong>{salon.workingHours}</strong></li></ul><div className="social-row">{salon.vkUrl ? <a href={salon.vkUrl} target="_blank" rel="noreferrer">VK</a> : null}{salon.telegramUrl ? <a href={salon.telegramUrl} target="_blank" rel="noreferrer">Telegram</a> : null}{salon.whatsappUrl ? <a href={salon.whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a> : null}</div></div>
         <div className="map-card">
-          {mapEmbedUrl ? <iframe src={mapEmbedUrl} title="Студия Престиж на карте" loading="lazy" /> : null}
-          <div className="map-card-caption"><span>64.537494, 39.805033</span><strong>{salon.address}</strong><a href={salon.mapUrl ?? "#contacts"} target="_blank" rel="noreferrer">Построить маршрут →</a></div>
+          {mapEmbedUrl ? <iframe src={mapEmbedUrl} title={`${salon.name} на карте`} loading="lazy" /> : null}
+          <div className="map-card-caption"><span>{salon.latitude}, {salon.longitude}</span><strong>{salon.address}</strong><a href={salon.mapUrl ?? "#contacts"} target="_blank" rel="noreferrer">Построить маршрут →</a></div>
         </div>
       </section>
 
@@ -168,5 +168,5 @@ export default async function Home() {
 }
 
 function iconSymbol(icon: string) {
-  return ({ scissors: "✂", sparkles: "✦", heart: "♡", palette: "◉", waves: "≋", leaf: "⌁", hand: "◇", activity: "≈" } as Record<string, string>)[icon] ?? "✦";
+  return ({ scissors: "✂", sparkles: "✦", heart: "♡", palette: "◉", waves: "≋", leaf: "⌁", hand: "◇", activity: "≈", eye: "◌" } as Record<string, string>)[icon] ?? "✦";
 }

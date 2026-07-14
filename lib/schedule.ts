@@ -1,6 +1,6 @@
 export const WORKING_HOURS = {
-  start: "10:00",
-  end: "20:00"
+  start: "11:00",
+  end: "19:00"
 };
 
 export type ExistingAppointment = {

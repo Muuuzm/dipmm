@@ -11,7 +11,7 @@ const links = [
 ];
 
 export function SiteHeader({
-  salonName = "Студия Престиж",
+  salonName = "Зеркала",
   subtitle = "парикмахерская для всей семьи"
 }: {
   salonName?: string;

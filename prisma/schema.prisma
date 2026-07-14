@@ -82,8 +82,8 @@ model WeeklyShift {
   id        Int     @id @default(autoincrement())
   masterId  Int
   dayOfWeek Int
-  startTime String  @default("10:00")
-  endTime   String  @default("20:00")
+  startTime String  @default("11:00")
+  endTime   String  @default("19:00")
   isWorking Boolean @default(true)
   master    Master  @relation(fields: [masterId], references: [id], onDelete: Cascade)
 
@@ -121,10 +121,12 @@ model SalonSettings {
   subtitle          String
   tagline           String
   description       String
-  workingHoursStart String   @default("10:00")
-  workingHoursEnd   String   @default("20:00")
-  weekendHoursStart String   @default("10:00")
-  weekendHoursEnd   String   @default("19:00")
+  workingHoursStart String   @default("11:00")
+  workingHoursEnd   String   @default("19:00")
+  workingDaysLabel  String   @default("Пн-пт")
+  weekendHoursStart String   @default("11:00")
+  weekendHoursEnd   String   @default("18:00")
+  weekendDaysLabel  String   @default("Сб-вс")
   phone             String
   email             String
   address           String

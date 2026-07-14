@@ -1,17 +1,19 @@
 export const DEFAULT_SALON = {
   id: 1,
-  name: "Студия Престиж",
-  subtitle: "мужские и женские стрижки",
-  tagline: "Мужские стрижки рядом с домом",
+  name: "Зеркала",
+  subtitle: "парикмахерская в Северодвинске",
+  tagline: "Стрижки без лишних слов",
   description:
-    "В основном занимаемся мужскими стрижками. Также выполняем женские стрижки и другие услуги по предварительной записи.",
-  workingHoursStart: "10:00",
-  workingHoursEnd: "20:00",
-  weekendHoursStart: "10:00",
-  weekendHoursEnd: "19:00",
-  phone: "+7 (950) 252-69-99",
+    "Мужские и женские стрижки по предварительной записи. Дополнительно доступны услуги для волос, ногтей, бровей и ресниц.",
+  workingHoursStart: "11:00",
+  workingHoursEnd: "19:00",
+  workingDaysLabel: "Вт-пт",
+  weekendHoursStart: "11:00",
+  weekendHoursEnd: "18:00",
+  weekendDaysLabel: "Сб",
+  phone: "+7 (900) 911-02-22",
   email: "",
-  address: "г. Архангельск, просп. Победы, 58",
+  address: "г. Северодвинск, ул. Лебедева, 7А",
   heroImage:
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1400&q=88",
   aboutImage:
@@ -19,8 +21,8 @@ export const DEFAULT_SALON = {
   vkUrl: null,
   telegramUrl: null,
   whatsappUrl: null,
-  mapUrl: "https://yandex.ru/maps/-/CTBrYHlm",
-  latitude: 64.537494,
-  longitude: 39.805033,
+  mapUrl: "https://yandex.ru/maps/org/zerkala/3862380459/",
+  latitude: 64.540552,
+  longitude: 39.804762,
   updatedAt: new Date()
 };

@@ -9,10 +9,10 @@ export async function getSalonInfo() {
 
   return {
     ...value,
-    workingHours: `пн-пт ${value.workingHoursStart}-${value.workingHoursEnd} · сб-вс ${value.weekendHoursStart}-${value.weekendHoursEnd}`,
+    workingHours: `${value.workingDaysLabel} ${value.workingHoursStart}-${value.workingHoursEnd} · ${value.weekendDaysLabel} ${value.weekendHoursStart}-${value.weekendHoursEnd}`,
     schedule: [
-      { days: "Понедельник-пятница", start: value.workingHoursStart, end: value.workingHoursEnd },
-      { days: "Суббота-воскресенье", start: value.weekendHoursStart, end: value.weekendHoursEnd }
+      { days: value.workingDaysLabel, start: value.workingHoursStart, end: value.workingHoursEnd },
+      { days: value.weekendDaysLabel, start: value.weekendHoursStart, end: value.weekendHoursEnd }
     ],
     benefits: ["Мужские стрижки", "Женские услуги", "Онлайн-запись"]
   };
