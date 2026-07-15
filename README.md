@@ -90,17 +90,14 @@ docker compose -p parih -f compose.production.yaml ps
 
 Проект AI Author в `/opt/aiauthor` и его порт `127.0.0.1:8765` не используются контейнерами парикмахерской.
 
-Проект на сервере расположен в `/var/www/parih`, PM2-процесс — `parih-barbershop`.
+Старый сервер с каталогом `/var/www/parih` и PM2-процессом `parih-barbershop`
+выведен из production-контура. Не используйте его для обновлений: актуальный сайт,
+база данных и SSL работают на Docker-сервере из `/opt/parih`.
+
+Перед обновлением рекомендуется сделать резервную копию базы:
 
 ```bash
-cd /var/www/parih
-git pull
-npm ci
-npx prisma migrate deploy
-npm run prisma:seed
-npm run build
-pm2 restart parih-barbershop
-pm2 status
+cp /var/lib/parih/data/dev.db /var/lib/parih/data/dev-$(date +%Y%m%d-%H%M%S).db
 ```
 
 Seed использует `upsert` и не перезаписывает изменения, сделанные администратором. Он добавляет только отсутствующие начальные данные и связывает старые заявки с новым каталогом.
