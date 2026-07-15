@@ -1,0 +1,12 @@
+.git
+.next
+node_modules
+.env
+*.log
+prisma/dev.db
+prisma/*.db-journal
+android-client/.gradle
+android-client/.kotlin
+android-client/build
+android-client/app/build
+android-client/artifacts

@@ -78,6 +78,18 @@ npm run build
 
 ## Деплой
 
+### Docker Compose (текущий сервер)
+
+Парикмахерская разворачивается изолированно в `/opt/parih`. SQLite хранится вне контейнера в `/var/lib/parih/data/dev.db`, а Caddy автоматически обслуживает HTTPS для `parih.svoiprox.pro`.
+
+```bash
+cd /opt/parih
+docker compose -p parih -f compose.production.yaml up -d --build
+docker compose -p parih -f compose.production.yaml ps
+```
+
+Проект AI Author в `/opt/aiauthor` и его порт `127.0.0.1:8765` не используются контейнерами парикмахерской.
+
 Проект на сервере расположен в `/var/www/parih`, PM2-процесс — `parih-barbershop`.
 
 ```bash
